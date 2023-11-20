@@ -18,7 +18,7 @@ class Hub(Communicator):
         self.name = name
         self._authenticated_devices = {}
 
-        host = "192.168.2.2"
+        host = "192.168.2.4"
         port = 8080
         addr = (host, port)
 
@@ -80,11 +80,16 @@ def main():
         )
 
         if user_input == "send":
-            recipient = input("Enter recipient device ID: ")
+            recipient_ip = input("Enter recipient IP: ")
+            recipient_port = input("Enter recipient port: ")
             message = input("Enter message to send: ")
-            hub.send(message, recipient)
+            hub.send(message, (recipient_ip, recipient_port))
 
         elif user_input == "receive":
+            message = receive()
+            print("Received and decrypted message: ", message)
+
+        elif user_input == "mock-receive":
             recv = input("Enter encrypted message from IoT: ")
             message = hub.receive(recv, sender)
 

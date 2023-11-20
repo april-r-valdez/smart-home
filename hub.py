@@ -89,7 +89,7 @@ def main():
 
         elif user_input == "mock-receive":
             recv = input("Enter encrypted message from IoT: ")
-            message = hub.receive(recv, sender)
+            # message = hub.receive(recv, sender)
 
         elif user_input == "register":
             device_id = input("Enter device ID: ")

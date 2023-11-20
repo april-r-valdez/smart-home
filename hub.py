@@ -1,6 +1,7 @@
 from communicator import Communicator
 from socket import *
 
+
 class Hub(Communicator):
     """
     A Hub class for managing and communicating with associated IoT devices.
@@ -16,11 +17,11 @@ class Hub(Communicator):
         super().__init__(id)
         self.name = name
         self._authenticated_devices = {}
-        
+
         host = "192.168.2.2"
         port = 8080
         addr = (host, port)
-        
+
         self.setIP(host)
         self.setPort(port)
 
@@ -32,22 +33,22 @@ class Hub(Communicator):
 
     def send(self, message, recipient):
         # implement the sending with UDP here
-        
+
         # encrypt the message
-        cipher_text = self.encrypt(message).encode('utf-8')
+        cipher_text = self.encrypt(message).encode("utf-8")
         # send the packet over UDP
         self.commSocket.sendto(cipher_text, recipient)
-        
+
         return
 
     def receive(self, encrypted_message, sender):
         # implement the receiving with UDP here
-        
+
         # specify the maximum received buffer size
         buf = 1024 * 2
         # receive the data
         (data, addr) = self.commSocket.recvfrom(buf)
-        msg = str(data, 'utf-8')
+        msg = str(data, "utf-8")
         # decrypt the msg
         plain_text = self.decrypt(msg)
         return plain_text

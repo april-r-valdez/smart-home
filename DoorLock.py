@@ -41,13 +41,13 @@ def main():
     
     lock = DoorLock(1111)
     
-    message = input("Enter command:")
-    
+    message = input("Turn on device: ")
     if message != "on":
-        print("Unable to process command. Device turned off")
+        print("Unable to process command. Device currently off")
         return
     
     while message != "off" and message != "exit":
+        
         if message == "on" or message == "off":
             lock.set_state(message)
             print("Set state: " + message)
@@ -57,10 +57,15 @@ def main():
             print("Set status: " + message)
             
         elif message[:17] == "set keyless entry":
-            code = message[18:22]
-            print(len(code))
-            lock.set_keyless_entry(code)
-            print("Set keyless entry: " + code)
+            code = message[18:]
+            if len(code) != 4 or not code.isdigit():
+                print("Keyless entry code not set. Must contain 4 integer values.")
+            else:
+                lock.set_keyless_entry(code)
+                print("Set keyless entry: " + code)
+        
+        elif message[:17] == "set lock schedule":
+            print(message)
             
         elif message == "get state":
             print("Get state: " + lock.get_state())
@@ -77,6 +82,9 @@ def main():
             
         elif message == "exit":
             print("Exiting device")
+        
+        else:
+            print("Command not found")
          
         message = input("Enter another command:")  
             

@@ -24,7 +24,7 @@ class IOTDevice(Communicator):
         plain_text = self.decrypt(msg)
         return plain_text
 
-    def init_sockets(self, ip, port, ):
+    def init_sockets(self, ip, port ):
         # initialize 1-to-1 socket with hub here
         self.setIP(ip)
         self.setPort(port)

@@ -41,22 +41,45 @@ def main():
     
     lock = DoorLock(1111)
     
-    message = "Hi"
+    message = input("Enter command:")
     
-    if message == "on" or message == "off":
-        lock.set_state(message)
-    elif message == "lock" or message == "unlock":
-        lock.set_status(message)
-    elif message == "set keyless entry":
-        lock.set_keyless_entry(message)
-    elif message == "get state":
-        lock.get_state()
-    elif message == "get status":
-        lock.get_status()
-    elif message == "get keyless entry code":
-        lock.get_keyless_entry()
-    elif message == "get lock schedule":
-        lock.get_lock_schedule()
+    if message != "on":
+        print("Unable to process command. Device turned off")
+        return
+    
+    while message != "off" and message != "exit":
+        if message == "on" or message == "off":
+            lock.set_state(message)
+            print("Set state: " + message)
+            
+        elif message == "lock" or message == "unlock":
+            lock.set_status(message + "ed")
+            print("Set status: " + message)
+            
+        elif message[:17] == "set keyless entry":
+            code = message[18:22]
+            print(len(code))
+            lock.set_keyless_entry(code)
+            print("Set keyless entry: " + code)
+            
+        elif message == "get state":
+            print("Get state: " + lock.get_state())
+            
+        elif message == "get status":
+            print("Get status: " + lock.get_status())
+            
+        elif message == "get keyless entry":
+            print("Get keyless entry: " + lock.get_keyless_entry())
+            
+        elif message == "get lock schedule":
+            lock_time, unlock_time = lock.get_lock_schedule()
+            print("Get lock schedule: " + lock_time + "-" + unlock_time)
+            
+        elif message == "exit":
+            print("Exiting device")
+         
+        message = input("Enter another command:")  
+            
     
     
     

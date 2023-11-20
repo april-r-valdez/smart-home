@@ -34,6 +34,7 @@ class Hub(Communicator):
     def send(self, message, recipient):
         # encrypt the message
         cipher_text = self.encrypt(message).encode("utf-8")
+        print(f"Sending message to {recipient}")
         # send the packet over UDP
         self.commSocket.sendto(cipher_text, recipient)
 
@@ -44,6 +45,7 @@ class Hub(Communicator):
         buf = 1024 * 2
         # receive the data
         (data, addr) = self.commSocket.recvfrom(buf)
+        print(f"Receiving message from {addr}")
         msg = str(data, "utf-8")
         # decrypt the msg
         plain_text = self.decrypt(msg)

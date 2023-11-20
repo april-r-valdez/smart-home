@@ -27,6 +27,9 @@ class CameraIOT(IOTDevice):
     
 if __name__ == "__main__":
     camera1 = CameraIOT("c12")
+    camera1.init_sockets("192.168.2.4", 8080)
+    command = camera1.receive()
+    
     print(camera1.process_command('status'))
     
     

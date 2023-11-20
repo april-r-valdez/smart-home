@@ -110,7 +110,7 @@ def main():
             hub.send(message, (recipient_ip, int(recipient_port)))
 
         elif user_input == "receive":
-            print(f"Listening on {hub.ip}:{hub.port}..")
+            print(f"Listening on {hub._ip}:{hub._port}..")
             message = hub.receive()
             print("Received and decrypted message: ", message)
 

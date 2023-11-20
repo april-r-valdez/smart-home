@@ -1,3 +1,6 @@
+from abc import ABC, abstractmethod
+
+
 class Communicator:
     def __init__(self, id):
         # self.key = 0
@@ -11,8 +14,14 @@ class Communicator:
         decrypted_message = ""
         return decrypted_message
 
+    @abstractmethod
     def send(self, message, recipient):
-        return
+        pass
 
+    @abstractmethod
     def receive(self, encrypted_message, sender):
-        return
+        pass
+
+    @abstractmethod
+    def init_sockets():
+        pass

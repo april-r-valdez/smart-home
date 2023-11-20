@@ -24,7 +24,7 @@ class Communicator:
         pass
 
     @abstractmethod
-    def receive(self, encrypted_message, sender):
+    def receive(self):
         return
 
     @abstractmethod

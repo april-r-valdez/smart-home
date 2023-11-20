@@ -9,7 +9,7 @@ class IOTDevice(Communicator):
         # implement the sending with UDP here
         return
 
-    def receive(self, encrypted_message, sender):
+    def receive(self):
         # implement the receiving with UDP here
         return
 

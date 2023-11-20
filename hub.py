@@ -18,7 +18,7 @@ class Hub(Communicator):
         self.name = name
         self._authenticated_devices = {}
 
-        host = "192.168.2.4"
+        host = "192.168.2.2"
         port = 8080
         addr = (host, port)
 
@@ -32,8 +32,6 @@ class Hub(Communicator):
         self.setSocket(UDP_socket)
 
     def send(self, message, recipient):
-        # implement the sending with UDP here
-
         # encrypt the message
         cipher_text = self.encrypt(message).encode("utf-8")
         # send the packet over UDP
@@ -41,9 +39,7 @@ class Hub(Communicator):
 
         return
 
-    def receive(self, encrypted_message, sender):
-        # implement the receiving with UDP here
-
+    def receive(self):
         # specify the maximum received buffer size
         buf = 1024 * 2
         # receive the data
@@ -83,10 +79,10 @@ def main():
             recipient_ip = input("Enter recipient IP: ")
             recipient_port = input("Enter recipient port: ")
             message = input("Enter message to send: ")
-            hub.send(message, (recipient_ip, recipient_port))
+            hub.send(message, ("192.168.2.3", 8080))
 
         elif user_input == "receive":
-            message = receive()
+            message = hub.receive()
             print("Received and decrypted message: ", message)
 
         elif user_input == "mock-receive":

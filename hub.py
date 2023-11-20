@@ -7,40 +7,45 @@ class Hub(Communicator):
     A Hub class for managing and communicating with associated IoT devices.
 
     Sends and receive commands to/from IoT devices (and users).
-        name:  name of this hub
-        _authenticated_devices:  dict of associated devices in {device_id : device_ip} pairs
+        name:       name of this hub
+        _authenticated_devices:  dict of associated devices in {device_id : (device_ip, device_port)} pairs
+        _ip:        IP address of this hub  (str)
+        _port:      Port number this hub is listening on  (int)
     """
 
     _authenticated_devices = None
+    _ip = None
+    _port = None
 
-    def __init__(self, name):
+    def __init__(self, name, ip, port):
+        """
+        Constructor: Instantiates a Hub instance.
+        """
         super().__init__(id)
+
+        # assign private properties
         self.name = name
         self._authenticated_devices = {}
+        self._ip = ip
+        self._port = int(port)
 
-        host = "192.168.2.2"
-        port = 8080
-        addr = (host, port)
-
-        self.setIP(host)
-        self.setPort(port)
-
-        UDP_socket = socket(AF_INET, SOCK_DGRAM)
-        UDP_socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-        UDP_socket.bind(addr)
-
-        self.setSocket(UDP_socket)
+        self.init_sockets()
 
     def send(self, message, recipient):
+        """
+        Sends an encrypted message to a recipient with UDP.
+            message:    plaintext to be sent
+            recipient:  (IP, port), retreived from _authenticated_devices
+        """
         # encrypt the message
-        cipher_text = self.encrypt(message).encode("utf-8")
-        print(f"Sending message to {recipient}")
+        # cipher_text = self.encrypt(message).encode("utf-8")
         # send the packet over UDP
-        self.commSocket.sendto(cipher_text, recipient)
-
-        return
+        self.commSocket.sendto(message.encode("utf-8"), recipient)
 
     def receive(self):
+        """
+        Listens for and decrypts an encrypted message.
+        """
         # specify the maximum received buffer size
         buf = 1024 * 2
         # receive the data
@@ -52,21 +57,35 @@ class Hub(Communicator):
         return plain_text
 
     def init_sockets(self):
-        # initialize 1-to-many socket here
+        """
+        Creates a socket. For initialization.
+        """
+        addr = (self._ip, self._port)
+
+        UDP_socket = socket(AF_INET, SOCK_DGRAM)
+        UDP_socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        UDP_socket.bind(addr)
+
+        self.setSocket(UDP_socket)
         return
 
-    def register_device(self, device_id, device_ip):
+    def register_device(self, device_id, device_ip, device_port):
         """
         Add the device to the internal list of authenticated devices.
 
         device_id:  id of the target IoT device
         deivce_ip:  IP address of the target IoT device
         """
-        self._authenticated_devices[device_id] = device_ip
+        self._authenticated_devices[device_id] = (device_ip, device_port)
 
 
 def main():
-    hub = Hub("HUB")
+    # instantiates a hub instance
+    print("Setting up a new Hub..")
+    input_ip = input("IP Address: ")
+    input_port = int(input("Port: "))
+
+    hub = Hub("HUB", input_ip, input_port)
 
     while True:
         # main device loop
@@ -74,27 +93,32 @@ def main():
 
         # _____for debugging uses only (input will be replaced by actual user device)_____
         user_input = input(
-            "!!!Enter a debug command (send, receive, register, list, exit): "
+            "!!!Enter a debug command (send, send-m, receive, register, list, exit): "
         )
 
-        if user_input == "send":
+        if user_input == "send-m":
+            # manual input for receipient addr
             recipient_ip = input("Enter recipient IP: ")
             recipient_port = input("Enter recipient port: ")
             message = input("Enter message to send: ")
-            hub.send(message, ("192.168.2.3", 8080))
+            hub.send(message, (recipient_ip, int(recipient_port)))
+
+        elif user_input == "send":
+            recipient_id = input("Enter recipient ID: ")
+            recipient_ip, recipient_port = hub._authenticated_devices[recipient_id]
+            message = input("Enter message: ")
+            hub.send(message, (recipient_ip, int(recipient_port)))
 
         elif user_input == "receive":
+            print(f"Listening on {hub.ip}:{hub.port}..")
             message = hub.receive()
             print("Received and decrypted message: ", message)
-
-        elif user_input == "mock-receive":
-            recv = input("Enter encrypted message from IoT: ")
-            # message = hub.receive(recv, sender)
 
         elif user_input == "register":
             device_id = input("Enter device ID: ")
             device_ip = input("Enter device IP: ")
-            hub.register_device(device_id, device_ip)
+            device_port = input("Ender device port: ")
+            hub.register_device(device_id, device_ip, device_port)
             print(f"!!!Device {device_id} registered with IP {device_ip}")
 
         elif user_input == "exit":

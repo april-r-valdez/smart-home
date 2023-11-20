@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
-class Communicator:    
+
+
+class Communicator:
     id = None
     ip = None
     port = None
-    commSocket = None    
-    
+    commSocket = None
+
     def __init__(self, id):
         # self.key = 0
         self.id = id
@@ -22,14 +24,19 @@ class Communicator:
         pass
 
     @abstractmethod
-    def receive(self, encrypted_message, sender):
+    def receive(self):
         return
-    
+
+    @abstractmethod
+    def process_command():
+        return
+
+    # setters
     def setIP(self, ipaddr):
         self.ip = ipaddr
-        
+
     def setPort(self, portNumber):
         self.port = portNumber
-        
+
     def setSocket(self, socket):
         self.commSocket = socket

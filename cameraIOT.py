@@ -1,11 +1,12 @@
 from IOTdevice import IOTDevice
+from Vigenere import VigenereCipher
 
 class CameraIOT(IOTDevice):
     status = None
     
     def __init__(self, id):
         super().__init__(id)
-        self.status = "ON"
+        self.status = "live"
     
     
     def process_command(self, command, message=None):
@@ -27,20 +28,16 @@ class CameraIOT(IOTDevice):
     
 if __name__ == "__main__":
     camera1 = CameraIOT("c12")
-    camera1.setEncryption("Lock")
-    
-    print(camera1.encrypt("on")) 
-        
+    camera1.setEncryption("1")
+
     print("Recieving......")
     camera1.init_sockets("192.168.2.4", 8080)
     command = camera1.receive()
-    
-    print("Need to process command: -> ", command)
-     
+
     output = camera1.process_command(command)  
     
     print("Repsonse sent to ")
     
-    camera1.send(output, ("192.168.2.3", 8080))
+    camera1.send(output, ("192.168.2.2", 8080))
     
     

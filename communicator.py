@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from Vigenere import VigenereCipher
+from Caesar import CaesarCipher
 
 class Communicator:
     id = None
@@ -52,4 +53,4 @@ class Communicator:
         
     def setEncryption(self, key):
         self.enableEncyption = True
-        self.cipher = VigenereCipher(key)
+        self.cipher = CaesarCipher(key)

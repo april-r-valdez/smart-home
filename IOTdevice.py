@@ -34,3 +34,14 @@ class IOTDevice(Communicator):
         self.setSocket(UDP_socket)
         
         return
+
+    def parse_command(self, command):
+        new_command = command
+        message = None
+        if command.find(";") != -1:
+            new_command = command.split(';')[0]
+            if len(command.split(";")) == 2: 
+                message = command.split(";")[1].strip()
+        
+        return new_command, message
+        

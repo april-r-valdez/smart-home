@@ -1,5 +1,7 @@
 from communicator import Communicator
 from socket import *
+import threading
+import time
 
 
 class Hub(Communicator):
@@ -77,6 +79,27 @@ class Hub(Communicator):
         deivce_ip:  IP address of the target IoT device
         """
         self._authenticated_devices[device_id] = (device_ip, device_port)
+    
+    def send_message(self):
+        
+        while True:
+            message = input("Enter message or 'exit': ")
+            recipient_ip = input("Enter destination ip: ")
+            recipient_port = int(input("Enter port: "))
+            
+            self.commSocket.sendto(message.encode("utf-8"), (recipient_ip, recipient_port))
+            time.sleep(2)
+    
+    def receive_message(self):
+        buf = 1024 * 2
+        while True:
+            # receive the data
+            (data, addr) = self.commSocket.recvfrom(buf)
+            print(f"Receiving message from {addr}")
+            msg = str(data, "utf-8")
+            # decrypt the msg
+            plain_text = self.decrypt(msg)
+            print(plain_text)
 
 
 def main():
@@ -86,51 +109,60 @@ def main():
     input_port = int(input("Port: "))
 
     hub = Hub("HUB", input_ip, input_port)
+    
+    receive_thread = threading.Thread(target=hub.receive_message)
+    send_thread = threading.Thread(target=hub.send_message)
 
-    while True:
-        # main device loop
-        # hub.receive()
+    receive_thread.start()
+    send_thread.start()
 
-        # _____for debugging uses only (input will be replaced by actual user device)_____
-        user_input = input(
-            "!!!Enter a debug command (send, send-m, receive, register, list, exit): "
-        )
+    receive_thread.join()
+    send_thread.join()
 
-        if user_input == "send-m":
-            # manual input for receipient addr
-            recipient_ip = input("Enter recipient IP: ")
-            recipient_port = input("Enter recipient port: ")
-            message = input("Enter message to send: ")
-            hub.send(message, (recipient_ip, int(recipient_port)))
+    # while True:
+    #     # main device loop
+    #     # hub.receive()
 
-        elif user_input == "send":
-            recipient_id = input("Enter recipient ID: ")
-            recipient_ip, recipient_port = hub._authenticated_devices[recipient_id]
-            message = input("Enter message: ")
-            hub.send(message, (recipient_ip, int(recipient_port)))
+    #     # _____for debugging uses only (input will be replaced by actual user device)_____
+    #     user_input = input(
+    #         "!!!Enter a debug command (send, send-m, receive, register, list, exit): "
+    #     )
 
-        elif user_input == "receive":
-            print(f"Listening on {hub.ip}:{hub.port}..")
-            message = hub.receive()
-            print("Received and decrypted message: ", message)
+    #     if user_input == "send-m":
+    #         # manual input for receipient addr
+    #         recipient_ip = input("Enter recipient IP: ")
+    #         recipient_port = input("Enter recipient port: ")
+    #         message = input("Enter message to send: ")
+    #         hub.send(message, (recipient_ip, int(recipient_port)))
 
-        elif user_input == "register":
-            device_id = input("Enter device ID: ")
-            device_ip = input("Enter device IP: ")
-            device_port = input("Ender device port: ")
-            hub.register_device(device_id, device_ip, device_port)
-            print(f"!!!Device {device_id} registered with IP {device_ip}")
+    #     elif user_input == "send":
+    #         recipient_id = input("Enter recipient ID: ")
+    #         recipient_ip, recipient_port = hub._authenticated_devices[recipient_id]
+    #         message = input("Enter message: ")
+    #         hub.send(message, (recipient_ip, int(recipient_port)))
 
-        elif user_input == "exit":
-            print("!!!HUB terminated")
-            break
+    #     elif user_input == "receive":
+    #         print(f"Listening on {hub.ip}:{hub.port}..")
+    #         message = hub.receive()
+    #         print("Received and decrypted message: ", message)
 
-        elif user_input == "list":
-            print(hub._authenticated_devices)
-            break
+    #     elif user_input == "register":
+    #         device_id = input("Enter device ID: ")
+    #         device_ip = input("Enter device IP: ")
+    #         device_port = input("Ender device port: ")
+    #         hub.register_device(device_id, device_ip, device_port)
+    #         print(f"!!!Device {device_id} registered with IP {device_ip}")
 
-        else:
-            print("Invalid command.")
+    #     elif user_input == "exit":
+    #         print("!!!HUB terminated")
+    #         break
+
+    #     elif user_input == "list":
+    #         print(hub._authenticated_devices)
+    #         break
+
+    #     else:
+    #         print("Invalid command.")
 
 
 if __name__ == "__main__":

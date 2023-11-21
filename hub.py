@@ -117,6 +117,10 @@ class Hub(Communicator):
                 # list out all the authenticated devices
                 print(hub._authenticated_devices)
 
+            elif user_input == "key":
+                # update key
+                self.setEncryption(int(input("Key: ")), upperCaseAll=False)
+
             elif user_input == "exit":
                 # exit the program
                 print("HUB terminated")

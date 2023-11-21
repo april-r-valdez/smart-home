@@ -106,37 +106,40 @@ class thermostatIOT(IOTDevice):
         if message:
             output = mapper[command](message)
         else:
-            output =  mapper[command]
+            output =  mapper[command]()
             
         return output 
     
 # Example usage
 if __name__ == "__main__":
-    thermostat_device = thermostatIOT(1)
+    thermostat_device = thermostatIOT("1")
     thermostat_device.setEncryption(2, upperCaseAll=False)
     thermostat_device.init_sockets("192.168.2.6", 8080)
+    
 
-    print(f"Initial Temperature: {thermostat_device.get_temperature} °F")
+    # print(f"Initial Temperature: {thermostat_device.get_temperature} °F")
     
-    # Set a new temperature with a specified fan speed
-    thermostat_device.set_temperature(70.0, fan_speed='high')
+    # # Set a new temperature with a specified fan speed
+    # thermostat_device.set_temperature(70.0, fan_speed='high')
     
-    # Print the updated status and state
-    print(f"Current Status: {thermostat_device.get_status()}")
-    print(f"Current State: {thermostat_device.get_state()}")  
+    # # Print the updated status and state
+    # print(f"Current Status: {thermostat_device.get_status()}")
+    # print(f"Current State: {thermostat_device.get_state()}")  
     
-    thermostat_device.turn_on_heater()
-    # Print the updated status and state
-    print(f"Current Status: {thermostat_device.get_status()}")
-    print(f"Current State: {thermostat_device.get_state()}") 
+    # #thermostat_device.turn_on_heater()
+    # # Print the updated status and state
+    # print(f"Current Status: {thermostat_device.get_status()}")
+    # print(f"Current State: {thermostat_device.get_state()}") 
     
-    thermostat_device.turn_off_thermostat()
-    print(f"Current Status: {thermostat_device.get_status()}")
-    print(f"Current State: {thermostat_device.get_state()}") 
-    
+    # #thermostat_device.turn_off_thermostat()
+    # print(f"Current Status: {thermostat_device.get_status()}")
+    # print(f"Current State: {thermostat_device.get_state()}") 
+    print("Listening")
     command = thermostat_device.receive() 
-       
-    output = thermostat_device.process_command(command)
+    print(command)
+    command, message = thermostat_device.parse_command(command)
+    
+    output = thermostat_device.process_command(command, message)
     thermostat_device.send(output, ('192.168.2.2', 8080))
     
     

@@ -143,7 +143,7 @@ def main():
     input_port = int(input("Port: "))
     hub = Hub("HUB", input_ip, input_port)
 
-    hub.setEncryption(int(input("Key: ")))
+    hub.setEncryption(int(input("Key: ")), upperCaseAll=False)
 
     receive_thread = threading.Thread(target=hub.receive_message, args=(hub,))
     user_input_thread = threading.Thread(target=hub.user_input_loop, args=(hub,))

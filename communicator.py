@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
-
+from Vigenere import VigenereCipher
 
 class Communicator:
     id = None
     ip = None
     port = None
     commSocket = None
+    
 
     def __init__(self, id):
         # self.key = 0

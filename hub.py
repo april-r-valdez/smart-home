@@ -41,9 +41,9 @@ class Hub(Communicator):
             recipient:  (IP, port), retreived from _authenticated_devices
         """
         # encrypt the message
-        # cipher_text = self.encrypt(message).encode("utf-8")
+        cipher_text = self.encrypt(message).encode("utf-8")
         # send the packet over UDP
-        self.commSocket.sendto(message.encode("utf-8"), recipient)
+        self.commSocket.sendto(cipher_text, recipient)
 
     def receive(self):
         """
@@ -142,6 +142,8 @@ def main():
     input_ip = input("IP Address: ")
     input_port = int(input("Port: "))
     hub = Hub("HUB", input_ip, input_port)
+
+    hub.setEncryption(int(input("Key: ")))
 
     receive_thread = threading.Thread(target=hub.receive_message, args=(hub,))
     user_input_thread = threading.Thread(target=hub.user_input_loop, args=(hub,))

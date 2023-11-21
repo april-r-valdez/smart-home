@@ -1,5 +1,6 @@
 from IOTdevice import IOTDevice
 import random, time
+from datetime import datetime
 
 class thermostatIOT(IOTDevice):
     def __init__(self, id):
@@ -13,7 +14,7 @@ class thermostatIOT(IOTDevice):
     
     #getters
     @property
-    def temperature(self):
+    def get_temperature(self):
         return self._temperature
     
     SPEED_MAPPING = {'high': .5, 'med': 0.3, 'low': 0.1}
@@ -42,6 +43,13 @@ class thermostatIOT(IOTDevice):
         
     def turn_on_ac(self):
         self.set_status("Cooling")
+        self.set_state("On")
+        self.generate_sensor_data()
+        
+    def turn_off_thermostat(self):
+        self.set_status("Off")
+        self.set_state("Off")
+        self.generate_sensor_data()
         
     
     def set_temperature(self, new_temperature, fan_speed=None):
@@ -50,6 +58,7 @@ class thermostatIOT(IOTDevice):
             self._fan_speed = self.map_fan_speed(fan_speed)
             
             current_time = time.time()  # Get the current timestamp
+            readable_time = datetime.fromtimestamp(current_time).strftime('%H:%M:%S')
             
             while not (new_temperature - 0.5 <= self._temperature <= new_temperature + 0.5):
                 if(self._temperature > new_temperature):
@@ -63,52 +72,51 @@ class thermostatIOT(IOTDevice):
                     self._temperature += self._fan_speed
                     
                 current_time += update_interval  # Increment the timestamp
-                print(f"Current Temperature: {self._temperature} °F | Timestamp: {current_time}")
+                print(f"Current Temperature: {round(self._temperature, 2)} °F | Timestamp: {readable_time}")
                 time.sleep(update_interval)  # Introduce a delay between updates
             
     
     def generate_random_temperature(self):
-        return round(random.uniform(60, 80), 2)
+        return round(random.uniform(65, 75), 2)
     # Generate a random temperature between 65 and 75 in Fahrenheit  
                 
     def generate_sensor_data(self):
         self._fan_speed = self.map_fan_speed('med')
-        print(self._fan_speed)
         current_time = time.time()  # Get the current timestamp
+        readable_time = datetime.fromtimestamp(current_time).strftime('%H:%M:%S')
         update_interval = 1
-        while True:
-            if self._state == "Heating":
+        while self.get_state() == "On":
+            if self._status == "Heating":
                 self._temperature += self._fan_speed
-            elif self._state == "Cooling":
+            if self._status == "Cooling":
                 self._temperature -= self._fan_speed
-            print(self._temperature)
                 
             current_time += update_interval  # Increment the timestamp
-            print(f"Flux Temperature: {self._temperature} °F | Timestamp: {current_time}")
+            print(f"Flux Temperature: {round(self._temperature, 2)} °F | Timestamp: {readable_time}")
             time.sleep(update_interval)
             
     def process_command(self, command, message=None):
         mapper = {
-        'status': self.get_status(),
-        'temperature': self.temperature()
+        'get_status': self.get_status,
+        'set_status': self.set_status,
+        'state': self.get_state,
+        'temperature': self.get_temperature,
+        'set_temperature': self.set_temperature
         }
-        
         if message:
             output = mapper[command](message)
         else:
             output =  mapper[command]
             
         return output 
+    
 # Example usage
 if __name__ == "__main__":
     thermostat_device = thermostatIOT(1)
+    thermostat_device.setEncryption(2, upperCaseAll=False)
     thermostat_device.init_sockets("192.168.2.6", 8080)
 
-    print(f"Initial Temperature: {thermostat_device.temperature} °F")
-
-    # Print the updated status and state
-    print(f"Current Status: {thermostat_device.get_status()}")
-    print(f"Current State: {thermostat_device.get_state()}")   
+    print(f"Initial Temperature: {thermostat_device.get_temperature} °F")
     
     # Set a new temperature with a specified fan speed
     thermostat_device.set_temperature(70.0, fan_speed='high')
@@ -117,13 +125,18 @@ if __name__ == "__main__":
     print(f"Current Status: {thermostat_device.get_status()}")
     print(f"Current State: {thermostat_device.get_state()}")  
     
-    #thermostat_device.turn_on_heater()
+    thermostat_device.turn_on_heater()
     # Print the updated status and state
     print(f"Current Status: {thermostat_device.get_status()}")
-    print(f"Current State: {thermostat_device.get_state()}")  
+    print(f"Current State: {thermostat_device.get_state()}") 
     
-    command = thermostat_device.receive()    
+    thermostat_device.turn_off_thermostat()
+    print(f"Current Status: {thermostat_device.get_status()}")
+    print(f"Current State: {thermostat_device.get_state()}") 
+    
+    command = thermostat_device.receive() 
+       
     output = thermostat_device.process_command(command)
-    thermostat_device.send(output)
+    thermostat_device.send(output, ('192.168.2.2', 8080))
     
     

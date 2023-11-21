@@ -31,7 +31,7 @@ if __name__ == "__main__":
     camera1.setEncryption(2, upperCaseAll=False)
     
     print("Recieving......")
-    camera1.init_sockets("192.168.2.4", 8080)
+    camera1.init_sockets("192.168.2.6", 8080)
     command = camera1.receive()
 
     output = camera1.process_command(command)  

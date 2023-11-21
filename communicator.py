@@ -13,11 +13,11 @@ class Communicator:
 
     def encrypt(self, message):
         encrypted_message = ""
-        return encrypted_message
+        return message
 
     def decrypt(self, encrypted_message):
         decrypted_message = ""
-        return decrypted_message
+        return encrypted_message
 
     @abstractmethod
     def send(self, message, recipient):

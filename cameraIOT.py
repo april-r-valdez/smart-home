@@ -11,19 +11,19 @@ class CameraIOT(IOTDevice):
     
     def process_command(self, command, message=None):
         mapper = {
-        'status': self.get_status(),
+        'get_status': self.get_status,
+        'set_status': self.set_status
         }
-        
-        if message:
-            output = mapper[command](message)
-        else:
-            output =  mapper[command]
-            
-        return output
+           
+        return mapper[command](message) if message else mapper[command]()
            
             
     def get_status(self):
         return self.status
+    
+    def set_status(self, state):
+        self.status = state
+        return "200"
     
     
 if __name__ == "__main__":
@@ -31,10 +31,12 @@ if __name__ == "__main__":
     camera1.setEncryption(2, upperCaseAll=False)
     
     print("Recieving......")
-    camera1.init_sockets("192.168.2.6", 8080)
-    command = camera1.receive()
+    camera1.init_sockets("192.168.2.4", 8080)
+    response = camera1.receive()
 
-    output = camera1.process_command(command)  
+    command, message = camera1.parse_command(response)    
+
+    output = camera1.process_command(command, message)  
     
     print("Repsonse sent to ")
     

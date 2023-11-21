@@ -13,9 +13,8 @@ class thermostatIOT(IOTDevice):
         self._time_thermostate = "00:00"
     
     #getters
-    @property
     def get_temperature(self):
-        return self._temperature
+        return str(self._temperature)
     
     SPEED_MAPPING = {'high': .5, 'med': 0.3, 'low': 0.1}
     
@@ -72,8 +71,9 @@ class thermostatIOT(IOTDevice):
                     self._temperature += self._fan_speed
                     
                 current_time += update_interval  # Increment the timestamp
-                print(f"Current Temperature: {round(self._temperature, 2)} °F | Timestamp: {readable_time}")
+                #print(f"Current Temperature: {round(self._temperature, 2)} °F | Timestamp: {readable_time}")
                 time.sleep(update_interval)  # Introduce a delay between updates
+        return f"Reached {str(round(self._temperature, 2))} °F at {str(readable_time)}"
             
     
     def generate_random_temperature(self):
@@ -100,7 +100,7 @@ class thermostatIOT(IOTDevice):
         'get_status': self.get_status,
         'set_status': self.set_status,
         'state': self.get_state,
-        'temperature': self.get_temperature,
+        'get_temperature': self.get_temperature,
         'set_temperature': self.set_temperature
         }
         if message:
@@ -117,10 +117,10 @@ if __name__ == "__main__":
     thermostat_device.init_sockets("192.168.2.6", 8080)
     
 
-    # print(f"Initial Temperature: {thermostat_device.get_temperature} °F")
+    print(f"Initial Temperature: {thermostat_device.get_temperature} °F")
     
-    # # Set a new temperature with a specified fan speed
-    # thermostat_device.set_temperature(70.0, fan_speed='high')
+    # Set a new temperature with a specified fan speed
+    thermostat_device.set_temperature(70.0, fan_speed='high')
     
     # # Print the updated status and state
     # print(f"Current Status: {thermostat_device.get_status()}")
@@ -134,12 +134,13 @@ if __name__ == "__main__":
     # #thermostat_device.turn_off_thermostat()
     # print(f"Current Status: {thermostat_device.get_status()}")
     # print(f"Current State: {thermostat_device.get_state()}") 
-    print("Listening")
-    command = thermostat_device.receive() 
-    print(command)
-    command, message = thermostat_device.parse_command(command)
-    
-    output = thermostat_device.process_command(command, message)
-    thermostat_device.send(output, ('192.168.2.2', 8080))
+    while True:
+        print("Listening")
+        command = thermostat_device.receive() 
+        print(command)
+        command, message = thermostat_device.parse_command(command)
+
+        output = thermostat_device.process_command(command, message)
+        thermostat_device.send(output, ('192.168.2.8', 8080))
     
     

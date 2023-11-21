@@ -89,9 +89,7 @@ class Hub(Communicator):
             # hub.receive()
 
             # _____for debugging uses only (input will be replaced by actual user device)_____
-            user_input = input(
-                "Enter a debug command (send, send-m, receive, register, list, exit): "
-            )
+            user_input = input("Enter a debug command (send, register, list, exit): ")
 
             if user_input == "send":
                 # sends a message to target device ID
@@ -134,7 +132,8 @@ class Hub(Communicator):
         Second thread that continuously listens for messages.
         """
         while True:
-            hub.receive()
+            recv = hub.receive()
+            print(recv)
 
 
 def main():

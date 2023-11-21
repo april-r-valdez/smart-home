@@ -6,6 +6,8 @@ class Communicator:
     ip = None
     port = None
     commSocket = None
+    cipher = None
+    enableEncyption = False
     
 
     def __init__(self, id):
@@ -13,12 +15,18 @@ class Communicator:
         self.id = id
 
     def encrypt(self, message):
-        encrypted_message = ""
-        return message
+        if self.enableEncyption: 
+            encrypted_message = self.cipher.encrypt(message)
+            return encrypted_message
+        else:
+            return message
 
     def decrypt(self, encrypted_message):
-        decrypted_message = ""
-        return encrypted_message
+        if self.enableEncyption:
+            decrypted_message = self.cipher.decrypt(encrypted_message)
+            return decrypted_message
+        else:
+            return encrypted_message
 
     @abstractmethod
     def send(self, message, recipient):
@@ -41,3 +49,7 @@ class Communicator:
 
     def setSocket(self, socket):
         self.commSocket = socket
+        
+    def setEncryption(self, key):
+        self.enableEncyption = True
+        self.cipher = VigenereCipher(key)

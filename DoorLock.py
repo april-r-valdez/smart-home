@@ -54,53 +54,21 @@ class DoorLock(IOTDevice):
         return mapper[command](message) if message else mapper[command]()
 
 def main():
-    lock = DoorLock(1111)
+    lock = DoorLock(1111)    
+
+    lock.init_sockets("192.168.2.5", 8080)
+    command = lock.receive()
+    while command != "exit":
+        command, message = lock.parse_command(command)    
+        output = lock.process_command(command, message)
+        lock.send(output, ("192.168.2.2", 8080))
+        command = lock.receive()
     
-    # lock.init_sockets("192.168.2.5", 8080)
-    # for i in range(2):
-    #     command = lock.receive() 
-    #     # Parse command here and send command, message into process_command()
-    #     message = None
-    #     if command.find(";") != -1:
-    #         command = command.split(';')[0]
-    #         if len(command.split(";")) == 2: 
-    #             message = command.split(";")[1].strip()
-    #     output = lock.process_command(command, message)
-    #     print(output)
-    #     lock.send(output, ("192.168.2.2", 8080))
-    
-    
-    # lock.init_sockets("192.168.2.5", 8080)
-    # command = lock.receive() 
-    # # Parse command here and send command, message into process_command()
-    # message = None
-    # print(command)
-    # if command.find(";") != -1:
-    #     command = command.split(';')[0]
-    #     if len(command.split(";")) >= 2: 
-    #         message = command.split(";")[1].strip()
-    # output = lock.process_command(command, message)
-    # print(output)
-    # lock.send(output, ("192.168.2.2", 8080))
     
     # command = "set_state; on"
     # command = "set_state;on"
     # command = "get_state"
     # command = "set_lock_schedule; 12:00"
-
-    lock.init_sockets("192.168.2.5", 8080)
-    for i in range(2):
-        command = lock.receive() 
-        new_command = command
-        message = None
-        if command.find(";") != -1:
-            new_command = command.split(';')[0]
-            if len(command.split(";")) == 2: 
-                message = command.split(";")[1].strip()
-            
-        output = lock.process_command(new_command, message)
-        print(output)
-        lock.send(output, ("192.168.2.2", 8080))
     
     # command = input("Enter command: ")
     # while command != "exit":

@@ -84,35 +84,36 @@ class DoorLock(IOTDevice):
             return mapper[command](message) if message else mapper[command]()
         
         except TypeError as e:
-            print("ERROR: ", e)
+            return f"ERROR: {e}"
         except Exception as e:
             exception = e.args[0]
             if exception == "off":
-                print("ERROR: Device currently off")
+                return "ERROR: device currently off"
             elif exception == "invalid message":
-                print(f"ERROR: '{e.args[1]}' message not valid")
+                return f"ERROR: '{e.args[1]}' message not valid"
             else:
-                print(f"ERROR: {e} command not defined")
+                return f"ERROR: {e} command not defined"
             
 
 def main():
-    lock = DoorLock(1111)    
+    lock = DoorLock(1111)
+    lock.setEncryption(2, upperCaseAll=False)    
 
-    # lock.init_sockets("192.168.2.5", 8080)
-    # command = lock.receive()
-    # while command != "exit":
-    #     command, message = lock.parse_command(command)    
-    #     output = lock.process_command(command, message)
-    #     lock.send(output, ("192.168.2.2", 8080))
-    #     command = lock.receive()
-    
-    
-    command = input("Enter command: ")
+    lock.init_sockets("192.168.2.5", 8080)
+    command = lock.receive()
     while command != "exit":
-        command, message = lock.parse_command(command)
+        command, message = lock.parse_command(command)    
         output = lock.process_command(command, message)
-        print(output)
-        command = input("Enter another command: ")
+        lock.send(output, ("192.168.2.8", 8080))
+        command = lock.receive()
+    
+    
+    # command = input("Enter command: ")
+    # while command != "exit":
+    #     command, message = lock.parse_command(command)
+    #     output = lock.process_command(command, message)
+    #     print(output)
+    #     command = input("Enter another command: ")
     
     
 if __name__ == '__main__': 

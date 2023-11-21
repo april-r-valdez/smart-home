@@ -45,49 +45,79 @@ class DoorLock(IOTDevice):
             'set_status': self.set_status,
             'set_keyless_entry': self.set_keyless_entry,
             'set_lock_schedule': self.set_lock_schedule,
-            'get_state': self.get_state(),
-            'get_status': self.get_status(),
-            'get_keyless_entry': self.get_keyless_entry(),
-            'get_lock_schedule': self.get_lock_schedule(),
+            'get_state': self.get_state,
+            'get_status': self.get_status,
+            'get_keyless_entry': self.get_keyless_entry,
+            'get_lock_schedule': self.get_lock_schedule,
         }
-
-        if message:
-            output = mapper[command](message) 
-        else:
-            output =  mapper[command]
             
-        return output
+        return mapper[command](message) if message else mapper[command]()
 
 def main():
     lock = DoorLock(1111)
     
-    lock.init_sockets("192.168.2.5", 8080)
-    command = lock.receive() 
-    # Parse command here and send command, message into process_command()
-    message = None
-    if command.find(";") != -1:
-        command = command.split(';')[0]
-        if len(command.split(";")) == 2: 
-            message = command.split(";")[1].strip()
-    output = lock.process_command(command, message)
-    lock.send(output, ("192.168.2.2", 8080))
+    # lock.init_sockets("192.168.2.5", 8080)
+    # for i in range(2):
+    #     command = lock.receive() 
+    #     # Parse command here and send command, message into process_command()
+    #     message = None
+    #     if command.find(";") != -1:
+    #         command = command.split(';')[0]
+    #         if len(command.split(";")) == 2: 
+    #             message = command.split(";")[1].strip()
+    #     output = lock.process_command(command, message)
+    #     print(output)
+    #     lock.send(output, ("192.168.2.2", 8080))
+    
+    
+    # lock.init_sockets("192.168.2.5", 8080)
+    # command = lock.receive() 
+    # # Parse command here and send command, message into process_command()
+    # message = None
+    # print(command)
+    # if command.find(";") != -1:
+    #     command = command.split(';')[0]
+    #     if len(command.split(";")) >= 2: 
+    #         message = command.split(";")[1].strip()
+    # output = lock.process_command(command, message)
+    # print(output)
+    # lock.send(output, ("192.168.2.2", 8080))
     
     # command = "set_state; on"
+    # command = "set_state;on"
     # command = "get_state"
     # command = "set_lock_schedule; 12:00"
+
+    lock.init_sockets("192.168.2.5", 8080)
+    for i in range(2):
+        command = lock.receive() 
+        new_command = command
+        message = None
+        if command.find(";") != -1:
+            new_command = command.split(';')[0]
+            if len(command.split(";")) == 2: 
+                message = command.split(";")[1].strip()
+            
+        output = lock.process_command(new_command, message)
+        print(output)
+        lock.send(output, ("192.168.2.2", 8080))
     
-    # new_command = command
-    # message = None
-    # if command.find(";") != -1:
-    #     new_command = command.split(';')[0]
-    #     if len(command.split(";")) == 2: 
-    #         message = command.split(";")[1].strip()
+    # command = input("Enter command: ")
+    # while command != "exit":
+    #     command = "set_state; on"
+    #     command = "get_state"
+    #     command = "set_lock_schedule; 12:00"
     
-    # output = lock.process_command(new_command, message)
-    
-    # print(new_command)
-    # print(message)
-    # print(output)
+    #     new_command = command
+    #     message = None
+    #     if command.find(";") != -1:
+    #         new_command = command.split(';')[0]
+    #         if len(command.split(";")) == 2: 
+    #             message = command.split(";")[1].strip()
+        
+    #     output = lock.process_command(new_command, message)
+        
+    #     command = input("Enter command: ")
     
     
    

@@ -51,6 +51,19 @@ class Communicator:
     def setSocket(self, socket):
         self.commSocket = socket
         
-    def setEncryption(self, key):
+    def setEncryption(
+        self,
+        key,
+        removeSpace=True,          # Remove space
+        encryptSpace=False,         # Encrypt Space
+        encryptSymbol=False,        # Encypt Symbol
+        upperCaseAll=True,        # Uppercase ALL
+        reverseText = False    # Reverse Plain text
+    ):
         self.enableEncyption = True
         self.cipher = CaesarCipher(key)
+        self.cipher.removeSpace = removeSpace
+        self.cipher.encryptSpace = encryptSpace
+        self.cipher.upperCaseAll = upperCaseAll
+        self.cipher.reverseText = reverseText
+        self.cipher.encryptSymbol = encryptSymbol

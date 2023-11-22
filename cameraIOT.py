@@ -29,19 +29,22 @@ class CameraIOT(IOTDevice):
 if __name__ == "__main__":
     camera1 = CameraIOT("c12")
     camera1.setEncryption(2, upperCaseAll=False)
-    camera1.init_sockets("127.0.0.1", 8080)
+    camera1.init_sockets("192.168.2.7", 8080)
     
-    while True:
-        print("Recieving......")
-        
-        response = camera1.receive()
-
-        command, message = camera1.parse_command(response)    
+    print("Recieving......")
+    response = camera1.receive()
+    command, message = camera1.parse_command(response) 
+    
+    while command != "exit": 
 
         output = camera1.process_command(command, message)  
         
-        print("Repsonse sent to ")
+        print("Repsonse sent to ")        
+        camera1.send(output, ("192.168.2.8", 8080))
+        print("Recieving......")
+        response = camera1.receive()
+        command, message = camera1.parse_command(response)
         
-        camera1.send(output, ("127.0.0.1", 8081))
+    print("IOT has exited")
     
     

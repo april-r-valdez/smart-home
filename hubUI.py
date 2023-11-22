@@ -94,7 +94,16 @@ class HubUI:
 
     def receive_messages(self):
         while True:
-            message = self.hub.receive()
+            message, sender_addr = self.hub.receive()
+            sender_ip, sender_port = sender_addr
+            sender_id = ''
+            for id, addr in self.hub._authenticated_devices.items():
+                ip, port = addr
+                if ip == sender_ip:
+                  sender_id = id
+                  break
+
+            message = sender_id + ": " + message
             self.display_received_message(message)
 
     def display_received_message(self, message):

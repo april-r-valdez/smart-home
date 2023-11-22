@@ -55,7 +55,7 @@ class Hub(Communicator):
         msg = str(data, "utf-8")
         # decrypt the msg
         plain_text = self.decrypt(msg)
-        return plain_text
+        return plain_text, addr
 
     def init_sockets(self):
         """

@@ -134,13 +134,13 @@ if __name__ == "__main__":
     # #thermostat_device.turn_off_thermostat()
     # print(f"Current Status: {thermostat_device.get_status()}")
     # print(f"Current State: {thermostat_device.get_state()}") 
-    while True:
+    command = thermostat_device.receive
+    while command != 'exit':
         print("Listening")
-        command = thermostat_device.receive() 
         print(command)
         command, message = thermostat_device.parse_command(command)
-
         output = thermostat_device.process_command(command, message)
         thermostat_device.send(output, ('192.168.2.8', 8080))
+        command = thermostat_device.receive() 
     
     

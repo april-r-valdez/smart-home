@@ -28,7 +28,7 @@ class CameraIOT(IOTDevice):
     
 if __name__ == "__main__":
     camera1 = CameraIOT("c12")
-    camera1.setEncryption(2, upperCaseAll=False)
+    camera1.setEncryption(2, upperCaseAll=False, removeSpace=False)
     camera1.init_sockets("192.168.2.7", 8080)
     
     print("Recieving......")

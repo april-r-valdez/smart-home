@@ -113,7 +113,7 @@ class thermostatIOT(IOTDevice):
 # Example usage
 if __name__ == "__main__":
     thermostat_device = thermostatIOT("1")
-    thermostat_device.setEncryption(2, upperCaseAll=False)
+    thermostat_device.setEncryption(2, upperCaseAll=False, removeSpace=False)
     thermostat_device.init_sockets("192.168.2.6", 8080)
     
 

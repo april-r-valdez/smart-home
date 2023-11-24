@@ -97,7 +97,7 @@ class DoorLock(IOTDevice):
 
 def main():
     lock = DoorLock(1111)
-    lock.setEncryption(2, upperCaseAll=False)    
+    lock.setEncryption(2, upperCaseAll=False, removeSpace=False)    
 
     lock.init_sockets("192.168.2.5", 8080)
     command = lock.receive()

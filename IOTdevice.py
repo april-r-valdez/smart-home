@@ -6,19 +6,38 @@ class IOTDevice(Communicator):
     def __init__(self, id):
         super().__init__(id)
 
-    def send(self, message, recipient):
-        # encrypt the message
-        cipher_text = self.encrypt(message).encode("utf-8")
-        # send the packet over UDP
-        self.commSocket.sendto(cipher_text, recipient)
+    def send(self, message, recipient, data_type=None, TCP_socket=None, server_addr=None):        
+        if data_type == 'image':            
+            # Use UDP connection to send header and length information            
+            header = data_type + ":" + str(len(message))
+            cipher_header = self.encrypt(header).encode("utf-8")
+            self.commSocket.sendto(cipher_header, recipient)
+            
+            # Waiting for acknowledgement of TCP connection verifying the length of image
+            response = self.receive()
+            if response == 'ack':
+                print("Ackowlegement Recieved")
+                size = len(message)
+#                 encrypt_image = self.encrypt(message)
+                TCP_socket.connect(server_addr)
+                TCP_socket.sendall(message)
+            
+            response = self.receive()
+            if response == 'done':
+                print("Transfer Complete")
+                TCP_socket.close()
+        else :
+            message = "text" + ":" + message  
+            # encrypt the message
+            cipher_text = self.encrypt(message).encode("utf-8")
+            # send the packet over UDP
+            self.commSocket.sendto(cipher_text, recipient)
 
         return
 
     def receive(self):
-        # specify the maximum received buffer size
-        buf = 1024 * 2
         # receive the data
-        (data, addr) = self.commSocket.recvfrom(buf)
+        (data, addr) = self.commSocket.recvfrom(self.buf)
         msg = str(data, "utf-8")
         # decrypt the msg
         plain_text = self.decrypt(msg)

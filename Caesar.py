@@ -2,13 +2,13 @@ from encryption import Encryption
 
 class CaesarCipher(Encryption):
     shift = 13 # default to ROT13
-    mod = 26
+    mod = 256
     
     def __init__(self, shiftValue,
-                 modValue = 26, 
-                 removeSpace=True,          # Remove space
-                 encryptSpace=False,         # Encrypt Space
-                 encryptSymbol=False,        # Encypt Symbol
+                 modValue = 256, 
+                 removeSpace=False,          # Remove space
+                 encryptSpace=True,         # Encrypt Space
+                 encryptSymbol=True,        # Encypt Symbol
                  upperCaseAll=True,        # Uppercase ALL
                  reverseText = False    # Reverse Plain text
                  ) -> None:
@@ -19,33 +19,25 @@ class CaesarCipher(Encryption):
      
         
     def encrypt(self, plainText):
-        cleaned_plainText, indexToSkip = self.applySettings(plainText)    # Apply settings according to specification
-        
+        cleaned_plainText, indexToSkip = self.applySettings(plainText)
+
         cipherText = ""
         for i, char in enumerate(cleaned_plainText):
             if i not in indexToSkip:
-                if char.islower():
-                    cipherText += chr(((ord(char) - ord('a') + self.shift) % self.mod) + ord('a'))
-                else:
-                    cipherText += chr(((ord(char) - ord('A') + self.shift) % self.mod) + ord('A')) 
+                cipherText += chr((ord(char) + self.shift) % self.mod)
             else:
-                cipherText += char 
-                
-        return cipherText             
+                cipherText += str(char)
 
+        return cipherText
 
     def decrypt(self, cipherText):
         cleaned_cipherText, indexToSkip = self.applySettings(cipherText)
-        
+
         plainText = ""
-        
         for i, char in enumerate(cleaned_cipherText):
             if i not in indexToSkip:
-                if char.islower():
-                    plainText += chr(((ord(char) - ord('a') - self.shift) % self.mod) + ord('a'))
-                else:
-                    plainText += chr(((ord(char) - ord('A') - self.shift) % self.mod) + ord('A')) 
+                plainText += chr((ord(char) - self.shift) % self.mod)
             else:
                 plainText += char
-                
+
         return plainText

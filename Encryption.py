@@ -1,5 +1,3 @@
-from abc import abstractmethod
-
 class Encryption:
     upperCaseAll = None
     removeSpace = None
@@ -39,13 +37,11 @@ class Encryption:
         if self.reverseText:
             plainText = self.reverseString(plainText)
             
-        return plainText, [i for i, char in enumerate(plainText) if not char.isalpha()]
+        return plainText, [i for i, char in enumerate(plainText) if not str(char).isalpha()]
             
-    @abstractmethod 
     def encrypt(self, plainText):
         pass
-    
-    @abstractmethod
+
     def decrypt(self, cipherText):
         pass
     

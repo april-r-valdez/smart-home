@@ -17,8 +17,8 @@ class thermostatIOT(IOTDevice):
         self.id = id
         self._temperature = self.generate_random_temperature() #random initial temperature
         self._fan_speed = self.map_fan_speed('med')
-        self._state = "Off"
-        self._status = "Off" #or "cooling" or "heating"
+        self._state = "off"
+        self._status = "off" #or "cooling" or "heating"
         self._time_thermostate = "00:00"
     
     #getters
@@ -47,25 +47,25 @@ class thermostatIOT(IOTDevice):
     
     def set_status(self, status):
         if self._state == "off": 
-             raise Exception("off")
-        if status == "Heating" or status == "Cooling":
+                raise Exception("off")
+        if status == "Heating" or status == "Cooling" or status == 'on':
             return "200" # success code
         else:
             raise Exception("invalid message", status)
     
     def turn_on_heater(self):
         self.set_status("Heating")
-        self.set_state("On")
+        self.set_state("on")
         self.generate_sensor_data()
         
     def turn_on_ac(self):
         self.set_status("Cooling")
-        self.set_state("On")
+        self.set_state("on")
         self.generate_sensor_data()
         
     def turn_off_thermostat(self):
-        self.set_status("Off")
-        self.set_state("Off")
+        self.set_status("off")
+        self.set_state("off")
         self.generate_sensor_data()
         
     
@@ -82,13 +82,13 @@ class thermostatIOT(IOTDevice):
             
             while not (new_temperature - 0.5 <= self._temperature <= new_temperature + 0.5):
                 if(self._temperature > new_temperature):
+                    self.set_state("on")
                     self.set_status("Cooling")
-                    self.set_state("On")
                     self._temperature -= self._fan_speed
                     
                 elif(self._temperature < new_temperature):
+                    self.set_state("on")
                     self.set_status("Heating")
-                    self.set_state("On")
                     self._temperature += self._fan_speed
                     
                 current_time += update_interval  # Increment the timestamp
@@ -106,7 +106,7 @@ class thermostatIOT(IOTDevice):
         current_time = time.time()  # Get the current timestamp
         readable_time = datetime.fromtimestamp(current_time).strftime('%H:%M:%S')
         update_interval = 1
-        while self.get_state() == "On":
+        while self.get_state() == "on":
             if self._status == "Heating":
                 self._temperature += self._fan_speed
             if self._status == "Cooling":
@@ -161,10 +161,10 @@ if __name__ == "__main__":
     input_ip = input("IP Address: ")
     input_port = int(input("Port: "))
 
-    thermostat_device.init_sockets(input_port, input_port)
+    thermostat_device.init_sockets(input_ip, input_port)
     
 
-    print(f"Initial Temperature: {thermostat_device.get_temperature} °F")
+    print(f"Initial Temperature: {thermostat_device.get_temperature()} °F")
     
     # Set a new temperature with a specified fan speed
     thermostat_device.set_temperature(70.0, fan_speed='high')
@@ -181,10 +181,10 @@ if __name__ == "__main__":
     # #thermostat_device.turn_off_thermostat()
     # print(f"Current Status: {thermostat_device.get_status()}")
     # print(f"Current State: {thermostat_device.get_state()}") 
-    
-    command = thermostat_device.receive
+    print("Listening")
+    command = thermostat_device.receive()
     while command != 'exit':
-        print("Listening")
+        
         print(command)
         command, message = thermostat_device.parse_command(command)
         output = thermostat_device.process_command(command, message)

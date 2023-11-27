@@ -1,5 +1,6 @@
 
 from IOTdevice import IOTDevice
+from data.config import *
 
 class DoorLock(IOTDevice):
     def __init__(self, id):
@@ -102,8 +103,8 @@ def main():
     lock.setEncryption(2, upperCaseAll=False, removeSpace=False)    
     
     print("Setting up a new Smart DoorLock..")
-    input_ip = input("IP Address: ")
-    input_port = int(input("Port: "))
+    input_ip = DOORLOCK_IP
+    input_port = DOORLOCK_PORT
 
     lock.init_sockets(input_ip, input_port)
 
@@ -114,7 +115,7 @@ def main():
         output = lock.process_command(command, message)
         
         # Send returned output to Hub
-        lock.send(output, ("192.168.2.8", 8080))
+        lock.send(output, (HUB_IP, HUB_PORT))
         
         # Continue listening for next command
         command = lock.receive()

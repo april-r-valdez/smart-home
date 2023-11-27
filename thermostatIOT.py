@@ -1,6 +1,7 @@
 from IOTdevice import IOTDevice
 import random, time
 from datetime import datetime
+from data.config import *
 
 class thermostatIOT(IOTDevice):
     """
@@ -158,8 +159,8 @@ if __name__ == "__main__":
     thermostat_device.setEncryption(2, upperCaseAll=False, removeSpace=False)
     
     print("Setting up a new Smart DoorLock..")
-    input_ip = input("IP Address: ")
-    input_port = int(input("Port: "))
+    input_ip = THERMOSTAT_IP
+    input_port = THERMOSTAT_PORT
 
     thermostat_device.init_sockets(input_ip, input_port)
     
@@ -188,7 +189,7 @@ if __name__ == "__main__":
         print(command)
         command, message = thermostat_device.parse_command(command)
         output = thermostat_device.process_command(command, message)
-        thermostat_device.send(output, ('192.168.2.8', 8080))
+        thermostat_device.send(output, (HUB_IP, HUB_PORT))
         command = thermostat_device.receive() 
     
     

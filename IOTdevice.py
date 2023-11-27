@@ -60,8 +60,8 @@ class IOTDevice(Communicator):
         message = None
         if command.find(";") != -1:
             new_command = command.split(';')[0]
-            if len(command.split(";")) == 2: 
-                message = command.split(";")[1].strip()
+            if len(command.split(";")) > 1: 
+                message = command.split(";")[1:].strip()
         
         return new_command, message
         

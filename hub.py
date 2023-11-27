@@ -5,6 +5,7 @@ import time
 import io
 from PIL import Image
 import traceback
+from data.config import *
 
 
 class Hub(Communicator):
@@ -195,8 +196,8 @@ class Hub(Communicator):
 
 def main():
     print("Setting up a new Hub..")
-    input_ip = input("IP Address: ")
-    input_port = int(input("Port: "))
+    input_ip = HUB_IP
+    input_port = HUB_PORT
     hub = Hub("HUB", input_ip, input_port)
 
     hub.setEncryption(int(input("Key: ")), upperCaseAll=False, removeSpace=False)

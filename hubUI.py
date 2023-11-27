@@ -1,6 +1,7 @@
 from tkinter import Tk, Label, Entry, Button, Text, Scrollbar, Toplevel, END, messagebox
 from threading import Thread
 from hub import Hub
+from data.config import *
 
 class HubUI:
     def __init__(self, hub):
@@ -127,8 +128,8 @@ class HubUI:
 
 def main():
     print("Setting up a new Hub..")
-    input_ip = input("IP Address: ")
-    input_port = int(input("Port: "))
+    input_ip = HUB_IP
+    input_port = HUB_PORT
     hub = Hub("HUB", input_ip, input_port)
 
     hub.setEncryption(int(input("Key: ")), upperCaseAll=False, removeSpace=False)

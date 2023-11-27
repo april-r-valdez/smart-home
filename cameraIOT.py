@@ -1,5 +1,6 @@
 from IOTdevice import IOTDevice
 from Vigenere import VigenereCipher
+from data.config import *
 
 class CameraIOT(IOTDevice):
     """Simulate camera IOT"""
@@ -41,8 +42,8 @@ if __name__ == "__main__":
     camera1.setEncryption(2, upperCaseAll=False, removeSpace=False)
 
     print("Setting up a new Smart Camera..")
-    input_ip = input("IP Address: ")
-    input_port = int(input("Port: "))
+    input_ip = CAMERA_IP
+    input_port = CAMERA_PORT
     camera1.init_sockets(input_ip, input_port)
     
     print("Recieving......")
@@ -54,7 +55,7 @@ if __name__ == "__main__":
         output = camera1.process_command(command, message)  
         
         print("Repsonse sent to ")        
-        camera1.send(output, ("192.168.68.59", 8080))
+        camera1.send(output, (HUB_IP, HUB_PORT))
         print("Recieving......")
         response = camera1.receive()
         command, message = camera1.parse_command(response)

@@ -3,6 +3,15 @@ import random, time
 from datetime import datetime
 
 class thermostatIOT(IOTDevice):
+    """
+    A Hub class for managing and communicating with associated IoT devices.
+
+    Sends and receive commands to/from IoT devices (and users).
+        name:       name of this hub
+        _authenticated_devices:  dict of associated devices in {device_id : (device_ip, device_port)} pairs
+        _ip:        IP address of this hub  (str)
+        _port:      Port number this hub is listening on  (int)
+    """
     def __init__(self, id):
         super().__init__(id)
         self.id = id
@@ -30,10 +39,19 @@ class thermostatIOT(IOTDevice):
     
     #setters
     def set_state(self, state):
-        self._state = state
+        if state == "on" or state == "off":    
+            self._state = state
+            return "200" # success code
+        else:
+            raise Exception("invalid message", state)
     
     def set_status(self, status):
-        self._status = status
+        if self._state == "off": 
+             raise Exception("off")
+        if status == "Heating" or status == "Cooling":
+            return "200" # success code
+        else:
+            raise Exception("invalid message", status)
     
     def turn_on_heater(self):
         self.set_status("Heating")
@@ -52,7 +70,10 @@ class thermostatIOT(IOTDevice):
         
     
     def set_temperature(self, new_temperature, fan_speed=None):
+        new_temperature = float(new_temperature)
         update_interval = 1
+        current_time = time.time()  # Get the current timestamp
+        readable_time = datetime.fromtimestamp(current_time).strftime('%H:%M:%S')
         if fan_speed is not None:
             self._fan_speed = self.map_fan_speed(fan_speed)
             
@@ -73,7 +94,7 @@ class thermostatIOT(IOTDevice):
                 current_time += update_interval  # Increment the timestamp
                 #print(f"Current Temperature: {round(self._temperature, 2)} °F | Timestamp: {readable_time}")
                 time.sleep(update_interval)  # Introduce a delay between updates
-        return f"Reached {str(round(self._temperature, 2))} °F at {str(readable_time)}"
+        return str(f"Reached_{str(round(self._temperature, 2))}_°F_at_ {str(readable_time)}")
             
     
     def generate_random_temperature(self):
@@ -97,11 +118,7 @@ class thermostatIOT(IOTDevice):
             
     def process_command(self, command, message=None):
         mapper = {
-        'get_status': self.get_status,
-        'set_status': self.set_status,
-        'state': self.get_state,
-        'get_temperature': self.get_temperature,
-        'set_temperature': self.set_temperature
+        
         }
         if message:
             output = mapper[command](message)
@@ -109,12 +126,42 @@ class thermostatIOT(IOTDevice):
             output =  mapper[command]()
             
         return output 
-    
+    # Searches for received message from Hub and calls it's corresponding function
+    def process_command(self, command, message=None):
+        try:
+            mapper = {
+                'get_status': self.get_status,
+                'set_status': self.set_status,
+                'state': self.get_state,
+                'get_temperature': self.get_temperature,
+                'set_temperature': self.set_temperature,
+                'heater': self.turn_on_heater,
+                'turn_off': self.turn_off_thermostat,
+            }
+            return mapper[command](message) if message else mapper[command]()
+        
+        # Returns error message if exception is thrown
+        except TypeError as e:
+            return f"ERROR: {e}"
+        except Exception as e:
+            exception = e.args[0]
+            if exception == "off":
+                return "ERROR: device currently off"
+            elif exception == "invalid message":
+                return f"ERROR: '{e.args[1]}' message not valid"
+            else:
+                return f"ERROR: {e} command not defined"
+            
 # Example usage
 if __name__ == "__main__":
     thermostat_device = thermostatIOT("1")
     thermostat_device.setEncryption(2, upperCaseAll=False, removeSpace=False)
-    thermostat_device.init_sockets("192.168.2.6", 8080)
+    
+    print("Setting up a new Smart DoorLock..")
+    input_ip = input("IP Address: ")
+    input_port = int(input("Port: "))
+
+    thermostat_device.init_sockets(input_port, input_port)
     
 
     print(f"Initial Temperature: {thermostat_device.get_temperature} °F")
@@ -134,6 +181,7 @@ if __name__ == "__main__":
     # #thermostat_device.turn_off_thermostat()
     # print(f"Current Status: {thermostat_device.get_status()}")
     # print(f"Current State: {thermostat_device.get_state()}") 
+    
     command = thermostat_device.receive
     while command != 'exit':
         print("Listening")

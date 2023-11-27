@@ -100,8 +100,13 @@ def main():
     # Instantiate door lock IoT device, set encryption, and initialize socket with Hub
     lock = DoorLock(1111)
     lock.setEncryption(2, upperCaseAll=False, removeSpace=False)    
-    lock.init_sockets("192.168.2.5", 8080)
     
+    print("Setting up a new Smart DoorLock..")
+    input_ip = input("IP Address: ")
+    input_port = int(input("Port: "))
+
+    lock.init_sockets(input_ip, input_port)
+
     # Receive, parse, and process command from Hub
     command = lock.receive()
     while command != "exit":

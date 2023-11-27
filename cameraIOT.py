@@ -39,7 +39,11 @@ class CameraIOT(IOTDevice):
 if __name__ == "__main__":
     camera1 = CameraIOT("c12")
     camera1.setEncryption(2, upperCaseAll=False, removeSpace=False)
-    camera1.init_sockets("192.168.68.59", 8081)
+
+    print("Setting up a new Smart Camera..")
+    input_ip = input("IP Address: ")
+    input_port = int(input("Port: "))
+    camera1.init_sockets(input_ip, input_port)
     
     print("Recieving......")
     response = camera1.receive()

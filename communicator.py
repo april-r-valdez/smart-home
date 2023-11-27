@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from Vigenere import VigenereCipher
 from Caesar import CaesarCipher
 
@@ -9,6 +8,7 @@ class Communicator:
     commSocket = None
     cipher = None
     enableEncyption = False
+    buf = 512
     
 
     def __init__(self, id):
@@ -29,15 +29,14 @@ class Communicator:
         else:
             return encrypted_message
 
-    @abstractmethod
     def send(self, message, recipient):
         pass
 
-    @abstractmethod
+
     def receive(self):
         return
 
-    @abstractmethod
+
     def process_command():
         return
 
@@ -67,3 +66,9 @@ class Communicator:
         self.cipher.upperCaseAll = upperCaseAll
         self.cipher.reverseText = reverseText
         self.cipher.encryptSymbol = encryptSymbol
+        
+    def compress_img(self, img_data):
+        return img_data
+    
+    def decompress_img(self, compress_data):
+        return compress_data

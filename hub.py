@@ -2,6 +2,9 @@ from communicator import Communicator
 from socket import *
 import threading
 import time
+import io
+from PIL import Image
+import traceback
 
 
 class Hub(Communicator):
@@ -48,14 +51,64 @@ class Hub(Communicator):
     def receive(self):
         """
         Listens for and decrypts an encrypted message.
-        """
-        # receive the data
-        (data, addr) = self.commSocket.recvfrom(self._buf)
-        print(f"Receiving message from {addr}")
-        msg = str(data, "utf-8")
-        # decrypt the msg
-        plain_text = self.decrypt(msg)
-        return plain_text, addr
+        """        
+        # Read header
+        try :
+            data, addr = self.commSocket.recvfrom(self._buf)
+            data = self.decrypt(data.decode('utf-8'))
+            data_type, message = data.split(':')
+        except Exception as e:
+            print(e)
+            return "Error reading response", ("0.0.0.0", 1111)
+        
+        
+        if data_type == "image":
+            try:
+                # Receive image
+                data_length = int(message)
+                TCP_socket = socket(AF_INET, SOCK_STREAM)
+                TCP_socket.bind((self._ip, 8085))
+                self.send("ack", addr)
+                TCP_socket.listen(8085)
+                
+                ## Accpet incoming connection
+                conn, client_tcp_addr = TCP_socket.accept()
+                print("Recieved TCP connection from : " + client_tcp_addr[0])
+    
+                encrypted_data = b''
+                expected_length = 0              
+                
+                while expected_length < data_length:             
+                    data = conn.recv(data_length - len(encrypted_data))
+                    if not data:
+                        break
+                    encrypted_data += data
+                    
+                self.send("done", addr)               
+                conn.close()
+                    
+                plain_img = Image.open(io.BytesIO(encrypted_data))
+                
+                display_thread = threading.Thread(target=self.show_image, args=(plain_img,))
+                display_thread.daemon = True  # Set as daemon thread
+                display_thread.start()                
+                return "Image Data recieved", addr
+            
+            
+            except Exception as e:
+                print(e)
+                traceback.print_exc()
+                return "Image Data error", ("0.0.0.0", 1111)
+        
+        else:   
+            # receive the data
+            print(f"Receiving message from {addr}")
+            # decrypt the msg
+            plain_text = message
+            return plain_text, addr
+        
+    def show_image(self, image):
+        image.show()
 
     def init_sockets(self):
         """
@@ -146,7 +199,7 @@ def main():
     input_port = int(input("Port: "))
     hub = Hub("HUB", input_ip, input_port)
 
-    hub.setEncryption(int(input("Key: ")), upperCaseAll=False)
+    hub.setEncryption(int(input("Key: ")), upperCaseAll=False, removeSpace=False)
 
     receive_thread = threading.Thread(target=hub.receive_message, args=(hub,))
     user_input_thread = threading.Thread(target=hub.user_input_loop, args=(hub,))

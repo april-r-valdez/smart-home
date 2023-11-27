@@ -2,6 +2,7 @@ from IOTdevice import IOTDevice
 from Vigenere import VigenereCipher
 
 class CameraIOT(IOTDevice):
+    """Simulate camera IOT"""
     status = None
     
     def __init__(self, id):
@@ -10,6 +11,15 @@ class CameraIOT(IOTDevice):
     
     
     def process_command(self, command, message=None):
+        """_summary_
+
+        Args:
+            command (string): Funtion to execute
+            message (string, optional): argument for the function. Defaults to None.
+
+        Returns:
+            string: result of the function call
+        """
         mapper = {
         'get_status': self.get_status,
         'set_status': self.set_status

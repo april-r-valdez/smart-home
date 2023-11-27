@@ -1,5 +1,5 @@
 
-**************************This is to be run on Micropython on ESP32 Cam module*****************************
+#**************************This is to be run on Micropython on ESP32 Cam module*****************************
 import time
 import camera
 import network
@@ -49,7 +49,7 @@ class ESPCamera(IOTDevice):
         if self.net.isconnected():						# Indicate if wifi connection is succesful
             print('Wifi successfully connected')
             self.status = 'Network connection established; ' + 'Camera is not initialized'
-            self.flash(5)
+            self.flash(2)
         else :
             print('Failed to connect Wifi')
         self.ip = self.net.ifconfig()[0]
@@ -59,13 +59,20 @@ class ESPCamera(IOTDevice):
         """
             Blink the Flash light on camera
         """
-        count = min(5, count)
-        while count > 0:
+        count = min(9, count)
+        if count == 0:
             self.f_pin.value(1)
-            time.sleep(0.5)
+            time.sleep(2)
             self.f_pin.value(0)
-            time.sleep(0.5)
-            count -= 1
+        else:       
+            while count > 0:
+                self.f_pin.value(1)
+                time.sleep(0.5)
+                self.f_pin.value(0)
+                time.sleep(0.5)
+                count -= 1
+        time.sleep(2)
+        return
     
     def init_camera(self):
         """
@@ -80,6 +87,11 @@ class ESPCamera(IOTDevice):
         return '200 - camera is live'
         
     def close_camera(self):
+        """Close and deinitialize camera
+
+        Returns:
+            string: confrimation of change
+        """
         if self.cam is not None:
             print('Camera is being closed')
             camera.deinit()
@@ -88,9 +100,15 @@ class ESPCamera(IOTDevice):
         return '200 - camera is closed'
         
     def get_status(self):
+        """
+            Report current status
+        """ 
         return self.status
     
     def set_status(self, value):
+        """
+            Manually set current status
+        """ 
         value = value.lower()
         if value == 'close':            
             self.close_camera()
@@ -112,9 +130,22 @@ class ESPCamera(IOTDevice):
         return
     
     def get_frame_option(self) :
+        """Provide frame option to select from
+
+        Returns:
+            string: List of available options 
+        """
         return "1-camera.FRAME_QVGA 2-camera.FRAME_VGA 3-camera.FRAME_SVGA 4-camera.FRAME_HD"
     
     def set_frame_option(self, opt) :
+        """Set image quality
+
+        Args:
+            opt (int): Picture quality of the image to select
+
+        Returns:
+            string: Confirmation of change
+        """
         mapper = {
             '1': camera.FRAME_QVGA,
             '2': camera.FRAME_VGA,
@@ -126,8 +157,7 @@ class ESPCamera(IOTDevice):
             return "Frame option set"
         else:
             return "Invalid Option"    
-        
-    
+            
     def take_photo(self):
         """ Capture image and feed it via UDP"""
         print("Capturing image.....")        
@@ -142,6 +172,15 @@ class ESPCamera(IOTDevice):
         return buf_data
 
     def process_command(self, command, message=None) :
+        """_summary_
+
+        Args:
+            command (string): Funtion to execute
+            message (string, optional): argument for the function. Defaults to None.
+
+        Returns:
+            string: result of the function call
+        """
         mapper = {
             'get_status': self.get_status,
             'camera_on': self.init_camera,
@@ -165,6 +204,17 @@ if __name__ == "__main__":
     # Set Encryption and socket
     camModule.setEncryption(2, upperCaseAll=False, removeSpace=False)
     camModule.init_sockets(camModule.ip, camModule.port)
+    
+    # Send wifi code using Flash
+    wifi_int = int(camModule.ip.split(".")[-1])
+    last_wifi_val = wifi_int % 10
+    first_wifi_val = wifi_int // 10
+    # Send signal
+    camModule.flash(first_wifi_val)
+    print(first_wifi_val)
+    print(last_wifi_val)
+    time.sleep(1)
+    camModule.flash(last_wifi_val)
     
     try :
         print("Recieving......")

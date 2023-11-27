@@ -1,4 +1,4 @@
-from encryption import Encryption
+from Encryption import Encryption
 
 class CaesarCipher(Encryption):
     shift = 13 # default to ROT13

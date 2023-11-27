@@ -44,7 +44,7 @@ class IOTDevice(Communicator):
         return plain_text
 
     def init_sockets(self, ip, port ):
-        # initialize 1-to-1 socket with hub here
+        # initialize 1-to-1 socket with Hub here
         self.setIP(ip)
         self.setPort(port)
         UDP_socket = socket(AF_INET, SOCK_DGRAM)
@@ -55,6 +55,7 @@ class IOTDevice(Communicator):
         return
 
     def parse_command(self, command):
+        # parse received command from Hub
         new_command = command
         message = None
         if command.find(";") != -1:

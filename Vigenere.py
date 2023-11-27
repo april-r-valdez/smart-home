@@ -1,5 +1,5 @@
 import sys
-from encryption import Encryption
+from Encryption import Encryption
 
 class VigenereCipher(Encryption):
     mod = 26

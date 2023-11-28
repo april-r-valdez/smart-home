@@ -132,7 +132,7 @@ def main():
     input_port = HUB_PORT
     hub = Hub("HUB", input_ip, input_port)
 
-    hub.setEncryption(int(input("Key: ")), upperCaseAll=False, removeSpace=False)
+    hub.setEncryption(KEY, upperCaseAll=False, removeSpace=False)
 
     hub_ui = HubUI(hub)
 

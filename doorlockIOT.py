@@ -100,7 +100,7 @@ class DoorLock(IOTDevice):
 def main():
     # Instantiate door lock IoT device, set encryption, and initialize socket with Hub
     lock = DoorLock(1111)
-    lock.setEncryption(2, upperCaseAll=False, removeSpace=False)    
+    lock.setEncryption(KEY, upperCaseAll=False, removeSpace=False)    
     
     print("Setting up a new Smart DoorLock..")
     input_ip = DOORLOCK_IP

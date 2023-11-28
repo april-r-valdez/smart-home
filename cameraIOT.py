@@ -39,7 +39,7 @@ class CameraIOT(IOTDevice):
     
 if __name__ == "__main__":
     camera1 = CameraIOT("c12")
-    camera1.setEncryption(2, upperCaseAll=False, removeSpace=False)
+    camera1.setEncryption(KEY, upperCaseAll=False, removeSpace=False)
 
     print("Setting up a new Smart Camera..")
     input_ip = CAMERA_IP

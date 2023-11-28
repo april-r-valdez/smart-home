@@ -135,6 +135,7 @@ class thermostatIOT(IOTDevice):
             current_time += update_interval  # Increment the timestamp
             print(f"Flux Temperature: {round(self._temperature, 2)} °F | Timestamp: {readable_time}")
             time.sleep(update_interval)
+        return str(f"Flux Temperature: {round(self._temperature, 2)} °F | Timestamp: {readable_time}")
             
     # Searches for received message from Hub and calls it's corresponding function
     def process_command(self, command, message=None):

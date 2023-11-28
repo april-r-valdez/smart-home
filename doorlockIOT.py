@@ -108,14 +108,20 @@ def main():
 
     lock.init_sockets(input_ip, input_port)
 
+    print("Receiving command from Hub")
+    
     # Receive, parse, and process command from Hub
     command = lock.receive()
     while command != "exit":
         command, message = lock.parse_command(command)    
         output = lock.process_command(command, message)
         
+        print("Sending output to Hub")
+        
         # Send returned output to Hub
         lock.send(output, (HUB_IP, HUB_PORT))
+        
+        print("Receiving command from Hub")
         
         # Continue listening for next command
         command = lock.receive()

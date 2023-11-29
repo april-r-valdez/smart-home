@@ -143,7 +143,6 @@ class thermostatIOT(IOTDevice):
             mapper = {
                 'get_status': self.get_status,
                 'get_state' : self.get_state,
-                'set_state' : self.set_state,
                 'get_temperature': self.get_temperature,
                 'set_temperature': self.set_temperature,
                 'set_heater': self.turn_on_heater,
@@ -179,7 +178,7 @@ if __name__ == "__main__":
     print(f"Initial Temperature: {thermostat_device.get_temperature()} °F")
     
     # Set a new temperature with a specified fan speed
-    thermostat_device.set_temperature(70.0, fan_speed='high')
+    thermostat_device.set_temperature('70.0,high')
     
     # # Print the updated status and state
     # print(f"Current Status: {thermostat_device.get_status()}")

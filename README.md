@@ -141,12 +141,12 @@ These IoT devices are modeled after real commercialized products with simulated 
   - `get_lock_time`
 - thermostat
   - `get_status`
-  - `set_status`: on, off
-  - `state`
+  - `get_state`
   - `get_temperature`
   - `set_temperature`: temp,fan_speed
     - (where temp is a float, fan_speed is high, med, low)
-  - `heater`
+  - `turn_on_heater`
+  - `turn_on_ac`
   - `turn_off`
 - security camera
   - `get_status`
